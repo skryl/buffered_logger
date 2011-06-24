@@ -25,8 +25,6 @@ class BufferedLogger
   class_eval do
     [:debug, :info, :warn, :error, :fatal, :unknown].each do |method|
       define_method(method) do |message|
-        #FIXME: logger hack
-        puts message
         @logger.send(method, (padding + formatter) % message.to_s)
       end
     end
