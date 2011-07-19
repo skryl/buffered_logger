@@ -1,4 +1,6 @@
 require File.join(File.dirname(__FILE__), "spec_helper.rb")
+require 'rubygems'
+require 'active_support/buffered_logger'
 
 describe BufferedLogger do
   before :each do
@@ -37,7 +39,7 @@ describe BufferedLogger do
   end
 
   describe 'delegation and magic methods' do
-    it 'should respond to delegated methods' do
+    it 'should maintain backwards compatibility with buffered_logger interface' do
       delegated = ActiveSupport::BufferedLogger.public_instance_methods(false)
       delegated.each { |method| @l.should respond_to(method) }
     end
@@ -57,6 +59,16 @@ describe BufferedLogger do
         l.send(s, "#{s}_message")
         f.string.should == "#{s}_message\n"
       end
+    end
+
+    it 'should buffer unflushed statements' do
+      @l.auto_flushing = 0
+      @l.info 'test'
+      @l.info 'test2'
+      @l.buffer_text.should == "test\ntest2\n"
+      @f.string.should == ''
+      @l.flush
+      @f.string.should == "test\ntest2\n"
     end
   end
 

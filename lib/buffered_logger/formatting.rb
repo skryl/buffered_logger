@@ -6,7 +6,7 @@ module BufferedLogger::Formatting
 private
 
   def initialize
-    @formatter = Hash.new { |h,k| h[k] = {} }
+    @formatter = BufferedLogger::ThreadHash.new { |h,k| h[k] = {} }
     super()
   end
 

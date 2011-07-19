@@ -1,9 +1,9 @@
 spec = Gem::Specification.new do |s|
   s.name = 'buffered_logger'
-  s.version = '0.0.2'
+  s.version = '0.1.0'
 
-  s.summary = "Extensions to ActiveSupport::BufferedLogger"
-  s.description = %{ActiveSupport's BufferedLogger with a few enhancements}
+  s.summary = "A flexible, thread safe logger with custom formatting and ANSI color support" 
+  s.description = %{A thread safe logger with formatting extensions. Based on active_support/buffered_logger.}
   s.files = Dir['lib/**/*.rb'] + Dir['spec/**/*.rb'] + ["README", "TODO"]
   s.require_path = 'lib'
   s.author = "Alex Skryl"

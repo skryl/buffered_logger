@@ -8,6 +8,7 @@ logging work is still delegated to to active_support/buffered_logger.
 FEATURES
 -------------------------------------------------------------------------------
 - per thread indentation
+- per thread auto flush setting
 - temporary indentation blocks
 - per severity formatting
 - ansi color output formats
@@ -53,6 +54,9 @@ l.indent do
   l.info 'some more info'
 end
 
+# setting auto_flushing
+l.auto_flushing = 2
+
 
 USAGE DETAILS
 -------------------------------------------------------------------------------
@@ -85,15 +89,17 @@ USAGE DETAILS
           "italic", "blue", "on_white"]
 
 * Indentation
-  - the padding is calculated on a per thread basis, meaning that every thread
-    has an indentation counter and all severity levels share the thread's 
-    indentation level
+  - the padding is calculated on a per thread basis and each thread has an
+    indentation counter which is shared across all severity levels
 
 * Formatting
-  - formatters are stored on a per thread/per severity basis, meaning that every
-    severity level in every logging thread allows for a custom formatter
-  - the following precedence is used when determining the formatter to use
+  - formatters are set on a per thread/per severity basis, meaning that every
+    severity level for every thread allows for a custom formatter
+  - the formatter search order is as follows
       1. current thread's formatter for specified severity
       2. master thread's formatter for specified severity
       3. master thread's default formatter
     
+* Thread Buffering
+  - the auto_flushing setting is set per thread and each thread defaults to
+    the autoflush setting of the master thread unless explicitly configured
