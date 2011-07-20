@@ -77,7 +77,7 @@ describe BufferedLogger do
       @l.info "haha"
 
       # colors are off so the keywords won't be parsed
-      @f.string.should == "$blue oh\n$red blah\n$blue hey\n$blue haha\n"
+      @f.string.should == "oh\nblah\nhey\nhaha\n"
     end
 
     it 'should use appropriate formatting for each severity level' do
@@ -85,7 +85,7 @@ describe BufferedLogger do
       @l.send(:set_formatter, :info, "$blue %s")
       @l.error 'error'
       @l.info 'info'
-      @f.string.should == "$red error\n$blue info\n"
+      @f.string.should == "error\ninfo\n"
     end
 
     it 'should use the master thread formatter if one isnt set' do
@@ -95,7 +95,7 @@ describe BufferedLogger do
       t = Thread.new do
         @l.error 'blah'
       end; t.join
-      @f.string.should == "$red test\n$red blah\n"
+      @f.string.should == "test\nblah\n"
     end
 
     it 'should use the master thread default formatter if one isnt set' do

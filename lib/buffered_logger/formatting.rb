@@ -71,7 +71,7 @@ class BufferedLogger::Formatter
 
   def %(message)
     formatted_message = @format % message.to_s
-    color? ? parse_color(formatted_message) : formatted_message
+    parse_color(formatted_message)
   end
 
 private
@@ -81,11 +81,15 @@ private
     color_matcher = /#{color_methods.map {|m| "\\$#{m}\\s?"}.join('|')}/
 
     strings = message.split(color_matcher)
-    colors = message.scan(color_matcher).map { |c| c[1..-1].strip }
+    if color?
+      colors = message.scan(color_matcher).map { |c| c[1..-1].strip }
 
-    colored_message = ''
-    strings[1..-1].each_with_index { |s,i| colored_message << self.send(colors[i], s) }
-    strings[0] + colored_message
+      colored_message = ''
+      strings[1..-1].each_with_index { |s,i| colored_message << self.send(colors[i], s) }
+      strings[0] + colored_message
+    else
+      strings.join('')
+    end
   end
 
 end
