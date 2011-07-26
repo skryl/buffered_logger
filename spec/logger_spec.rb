@@ -21,13 +21,18 @@ describe BufferedLogger do
       @f.string.should == "info\nwarn\n"
     end
 
-    it 'should support color when printing to STDOUT' do
+    it 'should support color for STDOUT unless forced' do
       l = BufferedLogger.new(STDOUT)
-      l.send(:color?).should == true
+      l.send(:stdout?).should == true
+      l.color?.should == true
+      l.toggle_color
+      l.color?.should == false
     end
 
-    it 'should not support color when not printing to STDOUT' do
-      @l.send(:color?).should == false
+    it 'should not support color when not printing to STDOUT unless forced' do
+      @l.color?.should == false
+      @l.toggle_color
+      @l.color?.should == true
     end
 
     it 'should autoset formatters during init' do
@@ -69,6 +74,11 @@ describe BufferedLogger do
       @f.string.should == ''
       @l.flush
       @f.string.should == "test\ntest2\n"
+    end
+
+    it 'should insert a blank line' do
+      @l.print_blank_line
+      @f.string.should == "\n"
     end
   end
 

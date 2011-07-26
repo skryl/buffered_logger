@@ -23,17 +23,11 @@ describe BufferedLogger::Formatter do
       @f.color?.should be_true
     end
 
-    it 'should toggle the color setting' do
-      @f.toggle_color
-      @f.color?.should be_false
-      @f.toggle_color
-      @f.color?.should be_true
-    end
-
     it 'should construct a formatter object based on params' do
-      f = BufferedLogger::Formatter.new(:format => '%s%s%s', :color => false)
+      l = BufferedLogger.new(STDOUT)
+      f = BufferedLogger::Formatter.new(:format => '%s%s%s', :logger => l)
       f.to_s.should == '%s%s%s'
-      f.color?.should be_false
+      f.color?.should be_true
     end
   end
 
@@ -77,7 +71,7 @@ describe BufferedLogger do
       @l.info "haha"
 
       # colors are off so the keywords won't be parsed
-      @f.string.should == "oh\nblah\nhey\nhaha\n"
+      @f.string.should == "\e[34moh\e[0m\n\e[31mblah\e[0m\n\e[34mhey\e[0m\n\e[34mhaha\e[0m\n"
     end
 
     it 'should use appropriate formatting for each severity level' do
@@ -85,7 +79,7 @@ describe BufferedLogger do
       @l.send(:set_formatter, :info, "$blue %s")
       @l.error 'error'
       @l.info 'info'
-      @f.string.should == "error\ninfo\n"
+      @f.string.should == "\e[31merror\e[0m\n\e[34minfo\e[0m\n"
     end
 
     it 'should use the master thread formatter if one isnt set' do
@@ -95,7 +89,7 @@ describe BufferedLogger do
       t = Thread.new do
         @l.error 'blah'
       end; t.join
-      @f.string.should == "test\nblah\n"
+      @f.string.should == "\e[31mtest\e[0m\n\e[31mblah\e[0m\n"
     end
 
     it 'should use the master thread default formatter if one isnt set' do

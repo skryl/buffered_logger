@@ -1,5 +1,5 @@
 module BufferedLogger::Indentation
-# padding is set at the thread level
+  INDENT_LEVEL = 2
 
   def initialize
     @padding = BufferedLogger::ThreadHash.new { |h,k| h[k] = BufferedLogger::Padding.new }
@@ -10,7 +10,7 @@ module BufferedLogger::Indentation
     @padding[Thread.current]
   end
 
-  def indent(level, &block)
+  def indent(level = INDENT_LEVEL, &block)
     if block_given?
       padding.indent(level)
       ret_val = block.call

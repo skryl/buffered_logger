@@ -59,7 +59,7 @@ end
 describe BufferedLogger do
   before :each do
     @f = StringIO.new
-    @l = BufferedLogger.new(@f)
+    @l = BufferedLogger.new(@f, 0, :error => "ERROR: %s")
   end
 
   describe 'indentation' do
@@ -85,8 +85,17 @@ describe BufferedLogger do
       @l.indent(4) do
         @l.info 'blah'
       end
+      @l.indent do
+        @l.info 'hehe'
+      end
       @l.info 'blah'
-      @f.string.should == "    blah\nblah\n"
+      @f.string.should == "    blah\n  hehe\nblah\n"
+    end
+
+    it "should indent message content but not formatting" do
+      @l.indent(4)
+      @l.error "error"
+      @f.string.should == "ERROR:     error\n" 
     end
   end
 end

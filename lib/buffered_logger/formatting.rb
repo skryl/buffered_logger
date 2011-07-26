@@ -3,23 +3,32 @@ require 'term/ansicolor'
 module BufferedLogger::Formatting
   DEFAULT_LEVEL = :default
 
-private
-
   def initialize
     @formatter = BufferedLogger::ThreadHash.new { |h,k| h[k] = {} }
+    @color = stdout?
     super()
   end
+
+  def color?
+    @color
+  end
+
+  def toggle_color
+    @color = !@color
+  end
+
+private
 
   def formatter(severity = DEFAULT_LEVEL)
     @formatter[Thread.current][severity] || @formatter[master_thread][severity] || default_formatter
   end
 
   def set_formatter(severity = DEFAULT_LEVEL, format = nil)
-    @formatter[Thread.current][severity] = BufferedLogger::Formatter.new(:format => format, :color => color?)
+    @formatter[Thread.current][severity] = BufferedLogger::Formatter.new(:format => format, :logger => self)
   end
 
   def default_formatter
-    @formatter[master_thread][DEFAULT_LEVEL] ||= BufferedLogger::Formatter.new(:color => color?)
+    @formatter[master_thread][DEFAULT_LEVEL] ||= BufferedLogger::Formatter.new(:logger => self)
   end
 
 # magic format getters/setters
@@ -44,7 +53,7 @@ class BufferedLogger::Formatter
 
   def initialize(params = {})
     @format = params[:format] || FORMAT
-    @color = params[:color] == false ? false : COLOR
+    @logger = params[:logger]
   end
 
 # format accessors
@@ -60,11 +69,7 @@ class BufferedLogger::Formatter
 # color accessors
 
   def color?
-    @color 
-  end
-
-  def toggle_color
-    @color = !@color
+    (@logger && @logger.color?) || COLOR
   end
 
 # formatting
@@ -77,19 +82,18 @@ class BufferedLogger::Formatter
 private
 
   def parse_color(message)
+    return message unless color?
+
     color_methods = Term::ANSIColor.instance_methods
     color_matcher = /#{color_methods.map {|m| "\\$#{m}\\s?"}.join('|')}/
 
     strings = message.split(color_matcher)
-    if color?
-      colors = message.scan(color_matcher).map { |c| c[1..-1].strip }
+    return strings.first if strings.size == 1
 
-      colored_message = ''
-      strings[1..-1].each_with_index { |s,i| colored_message << self.send(colors[i], s) }
-      strings[0] + colored_message
-    else
-      strings.join('')
-    end
+    colors = message.scan(color_matcher).map { |c| c[1..-1].strip }
+    colored_message = ''
+    strings[1..-1].each_with_index { |s,i| colored_message << self.send(colors[i], s) }
+    strings[0] + colored_message
   end
 
 end

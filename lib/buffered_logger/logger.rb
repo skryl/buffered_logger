@@ -34,8 +34,6 @@ class BufferedLogger
 
   def initialize(log, level = DEBUG, params = {})
     @master_thread = Thread.current
-    super()
-
     @level = severity_to_const(level)
     if log.respond_to?(:write)
       @log = log
@@ -45,6 +43,7 @@ class BufferedLogger
       FileUtils.mkdir_p(File.dirname(log))
       @log = open_log(log, (File::WRONLY | File::APPEND | File::CREAT))
     end
+    super()
     params.each { |k,v| SEVERITY_LEVELS.include?(k) ? set_formatter(k, v) : next }
   end
 
@@ -69,7 +68,7 @@ class BufferedLogger
   for severity in SEVERITY_LEVELS
     class_eval <<-EOT, __FILE__, __LINE__ + 1
       def #{severity}(message = nil, progname = nil, &block)
-        add(#{SEVERITY_MAP[severity]}, padding % (formatter(:#{severity}) % message.to_s), progname, &block)                  
+        add(#{SEVERITY_MAP[severity]}, formatter(:#{severity}) % (padding % message.to_s), progname, &block)                  
         nil
       end                                                            
 
@@ -77,6 +76,10 @@ class BufferedLogger
         #{SEVERITY_MAP[severity]} >= @level                                        
       end                                                            
     EOT
+  end
+
+  def print_blank_line
+    add(0, "\n")
   end
 
   # Silences the logger for the duration of the block.
@@ -95,7 +98,7 @@ class BufferedLogger
 
 private
 
-  def color?
+  def stdout?
     @log == STDOUT
   end
 
