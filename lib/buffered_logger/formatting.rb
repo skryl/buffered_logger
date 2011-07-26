@@ -9,13 +9,10 @@ module BufferedLogger::Formatting
     super()
   end
 
-  def color?
-    @color
-  end
-
-  def toggle_color
-    @color = !@color
-  end
+  def color?; @color end
+  def toggle_color; @color = !@color end
+  def disable_color; @color = false end
+  def enable_color; @color = true end
 
 private
 
