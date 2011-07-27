@@ -52,6 +52,7 @@ describe BufferedLogger do
   before :each do
     @f = StringIO.new
     @l = BufferedLogger.new(@f)
+    @l.enable_color
   end
 
   describe 'formatting' do

@@ -21,12 +21,20 @@ describe BufferedLogger do
       @f.string.should == "info\nwarn\n"
     end
 
+    it 'should be able to toggle color' do
+      @l.color?.should == false
+      @l.enable_color
+      @l.color?.should == true
+      @l.disable_color
+      @l.color?.should == false
+      @l.toggle_color
+      @l.color?.should == true
+    end
+
     it 'should support color for STDOUT unless forced' do
       l = BufferedLogger.new(STDOUT)
       l.send(:stdout?).should == true
       l.color?.should == true
-      l.toggle_color
-      l.color?.should == false
     end
 
     it 'should not support color when not printing to STDOUT unless forced' do
@@ -78,6 +86,11 @@ describe BufferedLogger do
 
     it 'should insert a blank line' do
       @l.print_blank_line
+      @f.string.should == "\n"
+    end
+
+    it 'should log an empty string' do
+      @l.info
       @f.string.should == "\n"
     end
   end
