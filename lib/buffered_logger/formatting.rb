@@ -66,7 +66,7 @@ class BufferedLogger::Formatter
 # color accessors
 
   def color?
-    (@logger && @logger.color?) || COLOR
+    @logger ?  @logger.color? : COLOR
   end
 
 # formatting
@@ -79,13 +79,11 @@ class BufferedLogger::Formatter
 private
 
   def parse_color(message)
-    return message unless color?
-
     color_methods = Term::ANSIColor.instance_methods
     color_matcher = /#{color_methods.map {|m| "\\$#{m}\\s?"}.join('|')}/
 
     strings = message.split(color_matcher)
-    return strings.first if strings.size == 1
+    return strings.join if (!color? || strings.empty?)
 
     colors = message.scan(color_matcher).map { |c| c[1..-1].strip }
     colored_message = ''
