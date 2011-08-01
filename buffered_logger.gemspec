@@ -10,5 +10,7 @@ spec = Gem::Specification.new do |s|
   s.email = "rut216@gmail.com"
   s.homepage = "http://github.com/skryl"
 
+  s.add_dependency(%q<term-ansicolor>, [">= 0"])
   s.add_dependency(%q<activesupport>, [">= 0"])
+  s.add_dependency(%q<i18n>, [">= 0"])
 end
